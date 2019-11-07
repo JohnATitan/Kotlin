@@ -23,6 +23,7 @@ class AddProductDialog(context: Context, private var addProductListener: AddProd
             if (etProductName.text.toString().isNotEmpty()) {
                 val product = Product()
                 product.name = etProductName.text.toString()
+                product.status = Product.IN_CART
                 addProductListener.onAddProductToCart(product)
                 dismiss()
             } else {

@@ -57,6 +57,7 @@ class CartProductsAdapter(private val context: Context, private val cartProducts
                             bool = false
                             holder.itemView.animate().x(-100f).setDuration(50).start()
                             val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+                            builder.setCancelable(false)
                             builder.setMessage("¿Estas seguro de querer eliminar este producto?")
                             builder.setNegativeButton("NO") { dialogInterface, i ->
                                 dialogInterface.dismiss()
@@ -68,6 +69,7 @@ class CartProductsAdapter(private val context: Context, private val cartProducts
                                 holder.itemView.animate().x(0f).setDuration(50).start()
                                 bool = true
                                 removeProduct(position)
+                                cartProductsListener.onDeleteProduct(product)
                             }
                             builder.show()
                         }
@@ -86,6 +88,12 @@ class CartProductsAdapter(private val context: Context, private val cartProducts
 
     fun removeProduct(index: Int) {
         productList.removeAt(index)
+        notifyDataSetChanged()
+    }
+
+    fun setProductList(selectProducts: List<Product>) {
+        productList.clear()
+        productList.addAll(selectProducts)
         notifyDataSetChanged()
     }
 

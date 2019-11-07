@@ -29,14 +29,14 @@ class BoughtProductsAdapter() : RecyclerView.Adapter<BoughtProductsAdapter.ViewH
         holder.tvProductName.text = product.name
     }
 
-    fun setProduct(product: Product) {
-        productList.add(product)
+    fun setProductList(selectProducts: List<Product>) {
+        productList.clear()
+        productList.addAll(selectProducts)
         notifyDataSetChanged()
     }
 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var tvProductName: TextView = itemView.findViewById(R.id.tvProductName)
-        var ivAction: ImageView = itemView.findViewById(R.id.ivAction)
     }
 }

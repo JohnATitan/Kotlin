@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bbva.carrito.R
 import com.bbva.carrito.data.models.Product
+import com.bbva.carrito.domain.presenters.MainPresenter
+import com.bbva.carrito.presentation.activities.views.MainView
 import com.bbva.carrito.presentation.adapter.BoughtProductsAdapter
 import com.bbva.carrito.presentation.adapter.CartProductsAdapter
 import com.bbva.carrito.presentation.adapter.listeners.CartProductsListener
@@ -14,7 +16,7 @@ import com.bbva.carrito.presentation.dialog.AddProductDialog
 import com.bbva.carrito.presentation.dialog.listeners.AddProductListener
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), View.OnClickListener, AddProductListener, CartProductsListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, AddProductListener, CartProductsListener, MainView {
 
     private val cartProductsAdapter by lazy {
         CartProductsAdapter(this, this)
@@ -24,11 +26,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AddProductListen
         BoughtProductsAdapter()
     }
 
+    lateinit var mainPresenter: MainPresenter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        initPresenter()
         initViews()
+        initValues();
+    }
+
+    private fun initPresenter() {
+        mainPresenter = MainPresenter(this, this)
     }
 
     private fun initViews() {
@@ -41,6 +51,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AddProductListen
         ivAddProduct.setOnClickListener(this)
     }
 
+    private fun initValues() {
+        mainPresenter.selectBoughtProducts()
+        mainPresenter.selectCartProducts()
+    }
+
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.ivAddProduct -> AddProductDialog(this, this).show()
@@ -48,7 +63,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AddProductListen
     }
 
     override fun onAddProductToCart(product: Product) {
-        cartProductsAdapter.setProduct(product)
+        mainPresenter.insertProduct(product)
+        initValues()
     }
 
     override fun onBoughtProduct(product: Product, index: Int) {
@@ -59,9 +75,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AddProductListen
             dialogInterface.dismiss()
         }
         builder.setPositiveButton("SI") { dialogInterface, i ->
-            boughtProductsAdapter.setProduct(product)
-            cartProductsAdapter.removeProduct(index)
+            mainPresenter.updateProduct(product)
+            initValues()
         }
         builder.show()
+    }
+
+    override fun onDeleteProduct(product: Product) {
+        mainPresenter.deleteProduct(product)
+        initValues()
+    }
+
+    override fun showCartProducts(productList: List<Product>) {
+        cartProductsAdapter.setProductList(productList)
+    }
+
+    override fun showBoughtProducts(productList: List<Product>) {
+        boughtProductsAdapter.setProductList(productList)
     }
 }
